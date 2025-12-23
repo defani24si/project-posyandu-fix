@@ -14,8 +14,9 @@ use App\Http\Controllers\CatatanImunisasiController;
 
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('home');
 });
+
 
 Route::resource('posyandu', PosyanduController::class);
 Route::resource('jadwal_posyandu', JadwalPosyanduController::class);

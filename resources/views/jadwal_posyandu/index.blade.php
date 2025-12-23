@@ -1,310 +1,269 @@
-@extends('adminlte::page')
+@extends('layout.app')
 
 @section('title', 'Jadwal Posyandu')
 
-@section('content_header')
-    <h1>Jadwal Posyandu</h1>
-@stop
-
 @section('content')
     @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
+        <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+            <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
     @endif
 
-    <div class="card">
-        <div class="card-header">
-            <h3 class="card-title">Daftar Jadwal Posyandu</h3>
-            @if(Auth::check() && Auth::user()->role === 'admin')
-            <div class="card-tools">
-                <a href="{{ route('jadwal_posyandu.create') }}" class="btn btn-primary btn-sm">
-                    <i class="fa fa-plus"></i> Tambah Jadwal
-                </a>
-            </div>
-            @endif
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-1">Jadwal Posyandu</h1>
+            <p class="text-muted mb-0 small">Daftar kegiatan posyandu</p>
         </div>
-        <div class="card-body">
-            <!-- FORM FILTER & SEARCH -->
-            <form method="GET" action="{{ route('jadwal_posyandu.index') }}" class="mb-3">
-                <div class="row">
-                    <!-- FILTER POSYANDU -->
-                    <div class="col-md-3">
-                        <select name="posyandu_id" class="form-select">
-                            <option value="">Semua Posyandu</option>
-                            @foreach($posyandus as $posyandu)
-                                <option value="{{ $posyandu->posyandu_id }}" {{ request('posyandu_id') == $posyandu->posyandu_id ? 'selected' : '' }}>
-                                    {{ $posyandu->nama }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-                    
-                    <!-- FILTER TANGGAL DARI -->
-                    <div class="col-md-2">
-                        <input type="date" name="tanggal_dari" class="form-control" 
-                               value="{{ request('tanggal_dari') }}" 
-                               placeholder="Tanggal Dari">
-                    </div>
-                    
-                    <!-- FILTER TANGGAL SAMPAI -->
-                    <div class="col-md-2">
-                        <input type="date" name="tanggal_sampai" class="form-control" 
-                               value="{{ request('tanggal_sampai') }}" 
-                               placeholder="Tanggal Sampai">
-                    </div>
-                    
-                    <!-- SEARCH INPUT -->
-                    <div class="col-md-3">
-                        <div class="input-group">
-                            <input type="text" name="search" class="form-control" 
-                                   value="{{ request('search') }}" 
-                                   placeholder="Cari tema, keterangan, atau posyandu..." 
-                                   aria-label="Search">
-                            <button type="submit" class="btn btn-outline-primary">
-                                <i class="fa fa-search"></i>
-                            </button>
-                            
-                            <!-- CLEAR SEARCH BUTTON -->
-                            @if(request('search'))
-                                <a href="{{ request()->fullUrlWithQuery(['search'=> null]) }}" 
-                                   class="btn btn-outline-secondary" 
-                                   title="Hapus pencarian">
-                                    <i class="fa fa-times"></i>
-                                </a>
-                            @endif
-                        </div>
-                    </div>
-                    
-                    <!-- BUTTONS -->
-                    <div class="col-md-2">
-                        <button type="submit" class="btn btn-primary w-100">
-                            <i class="fa fa-filter"></i> Filter
-                        </button>
-                    </div>
-                </div>
-                
-                <!-- RESET BUTTON -->
-                @if(request('posyandu_id') || request('tanggal_dari') || request('tanggal_sampai') || request('search'))
-                <div class="row mt-2">
-                    <div class="col-md-12">
-                        <a href="{{ route('jadwal_posyandu.index') }}" class="btn btn-secondary btn-sm">
-                            <i class="fa fa-refresh"></i> Reset Filter
-                        </a>
-                    </div>
-                </div>
-                @endif
-            </form>
+        @if(Auth::check() && Auth::user()->role === 'admin')
+        <a href="{{ route('jadwal_posyandu.create') }}" class="btn btn-primary btn-sm">
+            <i class="fas fa-plus me-1"></i> Tambah Jadwal
+        </a>
+        @endif
+    </div>
 
-            <div class="table-responsive">
-                <table class="table table-bordered table-striped">
-                    <thead>
-                        <tr>
-                            <th width="60">No</th>
-                            <th>Posyandu</th>
-                            <th>Tanggal</th>
-                            <th>Tema</th>
-                            <th>Poster</th>
-                            <th>Keterangan</th>
-                            <th width="150" class="text-center">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    @forelse($jadwals as $item)
-                        <tr>
-                            <td>{{ ($jadwals->currentPage() - 1) * $jadwals->perPage() + $loop->iteration }}</td>
-                            <td>{{ $item->posyandu->nama ?? '-' }}</td>
-                            <td>{{ \Carbon\Carbon::parse($item->tanggal)->format('d/m/Y') }}</td>
-                            <td>{{ $item->tema }}</td>
-                            <td class="text-center">
-                                @if($item->poster_kegiatan)
-                                    <img src="{{ asset('storage/' . $item->poster_kegiatan) }}" 
-                                         alt="Poster Kegiatan" 
-                                         class="img-thumbnail"
-                                         style="width: 50px; height: 50px; object-fit: cover; cursor: pointer;"
-                                         onclick="showPosterModal('{{ asset('storage/' . $item->poster_kegiatan) }}', '{{ $item->tema }}')">
-                                @else
-                                    <span class="text-muted">
-                                        <i class="fas fa-image"></i><br>
-                                        <small>Tidak ada</small>
-                                    </span>
-                                @endif
-                            </td>
-                            <td>{{ $item->keterangan ?? '-' }}</td>
-                            <td class="text-center">
-                                <div class="btn-group">
-                                    <a href="{{ route('jadwal_posyandu.show', $item->jadwal_id) }}" class="btn btn-info btn-sm">
-                                        <i class="fa fa-eye"></i>
-                                    </a>
-                                    @if(Auth::check() && Auth::user()->role === 'admin')
-                                    <a href="{{ route('jadwal_posyandu.edit', $item->jadwal_id) }}" class="btn btn-warning btn-sm">
-                                        <i class="fa fa-edit"></i>
-                                    </a>
-                                    <form action="{{ route('jadwal_posyandu.destroy', $item->jadwal_id) }}" method="POST" class="d-inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus data ini?')">
-                                            <i class="fa fa-trash"></i>
-                                        </button>
-                                    </form>
-                                    @endif
-                                </div>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="7" class="text-center text-muted py-4">
-                                <i class="fa fa-database fa-2x mb-2"></i><br>
-                                Tidak ada data jadwal posyandu
-                            </td>
-                        </tr>
-                    @endforelse
-                    </tbody>
-                </table>
+    <!-- Filter -->
+    <div class="card card-body shadow-sm mb-4 p-3">
+        <form method="GET" action="{{ route('jadwal_posyandu.index') }}" class="row g-2">
+            <div class="col-md-3">
+                <select name="posyandu_id" class="form-select form-select-sm">
+                    <option value="">Semua Posyandu</option>
+                    @foreach($posyandus as $posyandu)
+                        <option value="{{ $posyandu->posyandu_id }}" {{ request('posyandu_id') == $posyandu->posyandu_id ? 'selected' : '' }}>
+                            {{ $posyandu->nama }}
+                        </option>
+                    @endforeach
+                </select>
             </div>
             
-            <div class="card-footer clearfix">
-                {{ $jadwals->withQueryString()->links('pagination.custom') }}
+            <div class="col-md-2">
+                <input type="date" name="tanggal_dari" class="form-control form-control-sm" 
+                       value="{{ request('tanggal_dari') }}" placeholder="Dari">
             </div>
-        </div>
-    </div>
-
-    <!-- Modal untuk menampilkan poster -->
-    <div class="modal fade" id="posterModal" tabindex="-1" role="dialog" aria-labelledby="posterModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="posterModalLabel">Poster Kegiatan</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
+            
+            <div class="col-md-2">
+                <input type="date" name="tanggal_sampai" class="form-control form-control-sm" 
+                       value="{{ request('tanggal_sampai') }}" placeholder="Sampai">
+            </div>
+            
+            <div class="col-md-3">
+                <div class="input-group input-group-sm">
+                    <input type="text" name="search" class="form-control" 
+                           value="{{ request('search') }}" 
+                           placeholder="Cari tema...">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i>
                     </button>
                 </div>
+            </div>
+            
+            <div class="col-md-2">
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary btn-sm flex-fill">
+                        <i class="fas fa-filter me-1"></i> Filter
+                    </button>
+                    @if(request()->anyFilled(['posyandu_id', 'tanggal_dari', 'tanggal_sampai', 'search']))
+                    <a href="{{ route('jadwal_posyandu.index') }}" class="btn btn-outline-secondary btn-sm" title="Reset">
+                        <i class="fas fa-redo"></i>
+                    </a>
+                    @endif
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Cards -->
+    @if($jadwals->count() > 0)
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-3">
+            @foreach($jadwals as $item)
+            <div class="col">
+                <div class="card h-100 border shadow-sm">
+                    <!-- Poster Area -->
+                    <div class="text-center py-4 px-3 border-bottom bg-light" style="min-height: 180px;">
+                        @if($item->poster_kegiatan)
+                            <img src="{{ asset('storage/' . $item->poster_kegiatan) }}" 
+                                 class="img-fluid rounded" 
+                                 alt="Poster"
+                                 style="max-height: 140px; object-fit: contain; cursor: pointer;"
+                                 onclick="showPosterModal('{{ asset('storage/' . $item->poster_kegiatan) }}', '{{ $item->tema }}')">
+                        @else
+                            <div class="d-flex flex-column align-items-center justify-content-center h-100">
+                                <i class="fas fa-calendar-alt fa-3x text-muted mb-3"></i>
+                                <p class="text-muted small mb-0">Tidak ada poster</p>
+                            </div>
+                        @endif
+                    </div>
+                    
+                    <!-- Card Content -->
+                    <div class="card-body">
+                        <!-- Tanggal Badge -->
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <span class="badge bg-primary">
+                                {{ \Carbon\Carbon::parse($item->tanggal)->format('d/m/Y') }}
+                            </span>
+                            @if(Auth::check() && Auth::user()->role === 'admin')
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-link text-muted p-0" type="button" 
+                                        data-bs-toggle="dropdown">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a class="dropdown-item" href="{{ route('jadwal_posyandu.edit', $item->jadwal_id) }}">
+                                            <i class="fas fa-edit me-2"></i> Edit
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <form action="{{ route('jadwal_posyandu.destroy', $item->jadwal_id) }}" 
+                                              method="POST">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="dropdown-item text-danger" 
+                                                    onclick="return confirm('Yakin ingin menghapus?')">
+                                                <i class="fas fa-trash me-2"></i> Hapus
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
+                            @endif
+                        </div>
+                        
+                        <!-- Tema -->
+                        <h6 class="card-title fw-bold mb-2">{{ $item->tema }}</h6>
+                        
+                        <!-- Info -->
+                        <div class="mb-3">
+                            <p class="mb-1 small">
+                                <i class="fas fa-map-marker-alt text-muted me-1"></i>
+                                {{ $item->posyandu->nama ?? '-' }}
+                            </p>
+                            <p class="mb-0 small text-muted">
+                                <i class="fas fa-clock text-muted me-1"></i>
+                                {{ \Carbon\Carbon::parse($item->tanggal)->isoFormat('dddd') }}
+                            </p>
+                        </div>
+                        
+                        <!-- Keterangan -->
+                        @if($item->keterangan)
+                        <div class="border-top pt-2 mt-2">
+                            <p class="small text-muted mb-0">{{ Str::limit($item->keterangan, 60) }}</p>
+                        </div>
+                        @endif
+                    </div>
+                    
+                    <!-- Card Footer -->
+                    <div class="card-footer bg-white border-top-0 pt-0">
+                        <div class="d-grid">
+                            <a href="{{ route('jadwal_posyandu.show', $item->jadwal_id) }}" 
+                               class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-eye me-1"></i> Lihat Detail
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endforeach
+        </div>
+        
+        <!-- Pagination -->
+        @if($jadwals->hasPages())
+        <div class="mt-4">
+            {{ $jadwals->withQueryString()->links('pagination.custom') }}
+        </div>
+        @endif
+    @else
+        <!-- Empty State -->
+        <div class="card border shadow-sm">
+            <div class="card-body text-center py-5">
+                <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted mb-2">Tidak ada jadwal</h5>
+                <p class="text-muted small mb-0">Belum ada jadwal posyandu yang tersedia</p>
+            </div>
+        </div>
+    @endif
+
+    <!-- Modal Poster -->
+    <div class="modal fade" id="posterModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Poster Kegiatan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
                 <div class="modal-body text-center">
-                    <img id="modalPosterImage" src="" alt="Poster Kegiatan" class="img-fluid">
+                    <img id="modalPosterImage" src="" alt="Poster" class="img-fluid rounded">
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
                     <a id="downloadPoster" href="" download class="btn btn-primary">
-                        <i class="fas fa-download"></i> Download
+                        <i class="fas fa-download me-1"></i> Download
                     </a>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
                 </div>
             </div>
         </div>
     </div>
-@stop
 
-@section('css')
     <style>
-        .card-header {
-            border-bottom: none;
-            background-color: #007bff !important;
-        }
-        .table th {
-            font-weight: 600;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 12px 8px;
-        }
-        .btn-group {
-            gap: 4px;
-        }
-        .btn-group .btn {
-            border-radius: 6px;
-            padding: 0.4rem 0.8rem;
-            transition: all 0.3s ease;
-        }
-        .btn-info {
-            background-color: #17a2b8;
-            border-color: #17a2b8;
-        }
-        .btn-warning {
-            background-color: #ffc107;
-            border-color: #ffc107;
-            color: #212529;
-        }
-        .btn-danger {
-            background-color: #dc3545;
-            border-color: #dc3545;
-        }
-        .btn-group .btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-        .btn-group form {
-            display: inline;
-        }
-        .table-hover tbody tr:hover {
-            background-color: rgba(0, 123, 255, 0.05);
-            transition: all 0.3s ease;
-        }
-        .table-striped tbody tr:nth-of-type(odd) {
-            background-color: rgba(248, 250, 252, 0.8);
-        }
         .card {
-            border: none;
-            box-shadow: 0 4px 6px rgba(0, 123, 255, 0.1);
             border-radius: 8px;
+            transition: all 0.2s;
         }
-        .form-select, .form-control {
-            border-radius: 6px;
-            border: 1px solid #d1d5db;
+        
+        .card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
         }
-        .form-select:focus, .form-control:focus {
-            border-color: #007bff;
-            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        
+        .card-title {
+            font-size: 1rem;
+            line-height: 1.3;
         }
-        .btn-primary {
-            background-color: #007bff;
-            border-color: #007bff;
-            border-radius: 6px;
+        
+        .badge {
+            font-size: 0.75rem;
+            padding: 0.35em 0.65em;
+            border-radius: 4px;
         }
-        .btn-primary:hover {
-            background-color: #0056b3;
-            border-color: #0056b3;
+        
+        .card-footer {
+            background: transparent;
         }
-        .btn-secondary {
-            background-color: #6c757d;
-            border-color: #6c757d;
-            border-radius: 6px;
-            color: white;
+        
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
         }
-        .btn-outline-primary {
-            border-color: #007bff;
-            color: #007bff;
+        
+        .dropdown-menu {
+            min-width: 120px;
+            font-size: 0.875rem;
         }
-        .btn-outline-primary:hover {
-            background-color: #007bff;
-            border-color: #007bff;
+        
+        /* Layout yang lebih rapi */
+        .border-bottom {
+            border-bottom: 1px solid #dee2e6 !important;
         }
-        .btn-outline-secondary {
-            border-color: #6c757d;
-            color: #6c757d;
+        
+        .border-top {
+            border-top: 1px solid #dee2e6 !important;
         }
-        .alert-success {
-            background-color: #d4edda;
-            border: 1px solid #c3e6cb;
-            border-radius: 6px;
-            color: #155724;
-        }
-        .img-thumbnail {
-            border: 2px solid #007bff;
-            transition: transform 0.3s ease;
-        }
-        .img-thumbnail:hover {
-            transform: scale(1.1);
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .row-cols-md-2 > * {
+                width: 100%;
+            }
         }
     </style>
 @stop
 
 @section('js')
-    <script>
-        function showPosterModal(imageSrc, title) {
-            $('#modalPosterImage').attr('src', imageSrc);
-            $('#posterModalLabel').text('Poster: ' + title);
-            $('#downloadPoster').attr('href', imageSrc);
-            $('#posterModal').modal('show');
-        }
-    </script>
+<script>
+function showPosterModal(imageSrc, title) {
+    $('#modalPosterImage').attr('src', imageSrc);
+    $('.modal-title').text('Poster: ' + title);
+    $('#downloadPoster').attr('href', imageSrc);
+    $('#posterModal').modal('show');
+}
+</script>
 @stop
