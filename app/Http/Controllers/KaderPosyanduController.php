@@ -157,3 +157,4 @@ class KaderPosyanduController extends Controller
             ->with('success', 'Kader Posyandu berhasil dihapus.');
     }
 }
+
