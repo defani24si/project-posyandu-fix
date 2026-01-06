@@ -63,12 +63,12 @@ return [
     |
     */
 
-    'logo'                                    => '<b>Posyandu</b>Panut',
-    'logo_img'                                => 'vendor/adminlte/dist/img/AdminLTELogo.png',
-    'logo_img_class'                          => 'brand-image img-circle elevation-3',
+    'logo'                                    => '<b>Sistem</b> Posyandu',
+    'logo_img'                                => null, // Hilangkan logo image
+    'logo_img_class'                          => null,
     'logo_img_xl'                             => null,
-    'logo_img_xl_class'                       => 'brand-image-xs',
-    'logo_img_alt'                            => 'Admin Logo',
+    'logo_img_xl_class'                       => null,
+    'logo_img_alt'                            => null,
 
     /*
     |--------------------------------------------------------------------------
@@ -110,14 +110,14 @@ return [
     */
 
     'preloader'                               => [
-        'enabled' => true,
+        'enabled' => false, // Disable preloader
         'mode'    => 'fullscreen',
         'img'     => [
-            'path'   => 'vendor/adminlte/dist/img/AdminLTELogo.png',
-            'alt'    => 'AdminLTE Preloader Image',
-            'effect' => 'animation__shake',
-            'width'  => 60,
-            'height' => 60,
+            'path'   => null,
+            'alt'    => null,
+            'effect' => null,
+            'width'  => null,
+            'height' => null,
         ],
     ],
 
@@ -154,8 +154,8 @@ return [
 
     'layout_topnav'                           => null,
     'layout_boxed'                            => null,
-    'layout_fixed_sidebar'                    => null,
-    'layout_fixed_navbar'                     => null,
+    'layout_fixed_sidebar'                    => true,
+    'layout_fixed_navbar'                     => true,
     'layout_fixed_footer'                     => null,
     'layout_dark_mode'                        => null,
 
@@ -191,14 +191,16 @@ return [
     */
 
     'classes_body'                            => '',
-    'classes_brand'                           => 'bg-primary', // biru tua
+    'classes_brand'                           => 'bg-primary navbar-primary', // Brand dengan tema biru
     'classes_brand_text'                      => 'text-white',
     'classes_content_wrapper'                 => '',
     'classes_content_header'                  => '',
     'classes_content'                         => '',
-    'classes_sidebar'                         => 'sidebar-light-primary elevation-4', // biru muda untuk sidebar
+    'classes_sidebar'                         => 'sidebar-light-primary elevation-4', // Sidebar terang dengan aksen biru
     'classes_sidebar_nav'                     => '',
-    'classes_sidebar'                         => 'sidebar-light-primary elevation-4', // biru muda untuk sidebar
+    'classes_topnav'                          => 'navbar-primary navbar-dark', // Navbar dengan tema biru
+    'classes_topnav_nav'                      => 'navbar-expand',
+    'classes_topnav_container'                => 'container',
 
 
     /*
@@ -298,100 +300,103 @@ return [
     */
 
     'menu' => [
-    // Navbar items
-    [
-        'type'         => 'navbar-search',
-        'text'         => 'Cari',
-        'topnav_right' => true,
-    ],
-    [
-        'type'         => 'fullscreen-widget',
-        'topnav_right' => true,
-    ],
+        // Navbar items
+        [
+            'type'         => 'navbar-search',
+            'text'         => 'Cari',
+            'topnav_right' => true,
+        ],
+        [
+            'type'         => 'fullscreen-widget',
+            'topnav_right' => true,
+        ],
 
-    // Sidebar search
-    [
-        'type' => 'sidebar-menu-search',
-        'text' => 'Cari Menu',
-    ],
-    
-    // TAMBAHKAN MENU DASHBOARD DI SINI
-    [
-        'text'   => 'Dashboard',
-        'url'    => 'dashboard', // atau 'home'
-        'icon'   => 'fas fa-tachometer-alt',
-        'active' => ['dashboard', 'home'], // aktif jika route dashboard atau home
-    ],
+        // Sidebar search
+        [
+            'type' => 'sidebar-menu-search',
+            'text' => 'Cari Menu',
+        ],
+        
+        // Dashboard
+        [
+            'text'   => 'Dashboard',
+            'url'    => 'dashboard',
+            'icon'   => 'fas fa-tachometer-alt',
+            'active' => ['dashboard', 'home'],
+        ],
 
-    
-    // Menu utama
-  
-    [
-        'text'   => 'Posyandu',
-        'url'    => 'posyandu',
-        'icon'   => 'fas fa-hospital-user',
-        'active' => ['posyandu*'],
-    ],
-    [
-        'text'   => 'Jadwal Posyandu',
-        'url'    => 'jadwal_posyandu',
-        'icon'   => 'fas fa-calendar-alt',
-        'active' => ['jadwal_posyandu*'],
-    ],
-    [
-    'text'   => 'Kader Posyandu',
-    'url'    => 'kader-posyandu',
-    'icon'   => 'fas fa-user-nurse',
-    'active' => ['kader-posyandu*'],
-],
-[
-    'text'   => 'Data Warga',
-    'url'    => 'warga',
-    'icon'   => 'fas fa-user-friends',
-    'active' => ['warga*'],
-],
-[
-    'text'   => 'Layanan Posyandu',
-    'url'    => 'layanan-posyandu',
-    'icon'   => 'fas fa-hand-holding-medical',
-    'active' => ['layanan-posyandu*'],
-],
-[
-    'text'   => 'Catatan Imunisasi',
-    'url'    => 'catatan-imunisasi',
-    'icon'   => 'fas fa-syringe',
-    'active' => ['catatan-imunisasi*'],
-],
+        // Header - Data Master
+        ['header' => 'DATA MASTER'],
+        
+        [
+            'text'   => 'Posyandu',
+            'url'    => 'posyandu',
+            'icon'   => 'fas fa-hospital-user',
+            'active' => ['posyandu*'],
+        ],
+        [
+            'text'   => 'Jadwal Posyandu',
+            'url'    => 'jadwal_posyandu',
+            'icon'   => 'fas fa-calendar-alt',
+            'active' => ['jadwal_posyandu*'],
+        ],
+        [
+            'text'   => 'Kader Posyandu',
+            'url'    => 'kader-posyandu',
+            'icon'   => 'fas fa-user-nurse',
+            'active' => ['kader-posyandu*'],
+        ],
+        [
+            'text'   => 'Data Warga',
+            'url'    => 'warga',
+            'icon'   => 'fas fa-users',
+            'active' => ['warga*'],
+        ],
 
+        // Header - Layanan
+        ['header' => 'LAYANAN KESEHATAN'],
+        
+        [
+            'text'   => 'Layanan Posyandu',
+            'url'    => 'layanan-posyandu',
+            'icon'   => 'fas fa-hand-holding-medical',
+            'active' => ['layanan-posyandu*'],
+        ],
+        [
+            'text'   => 'Catatan Imunisasi',
+            'url'    => 'catatan-imunisasi',
+            'icon'   => 'fas fa-syringe',
+            'active' => ['catatan-imunisasi*'],
+        ],
 
-    // Header info tambahan
-    ['header' => 'Menu Tambahan'],
-    [
-        'text'    => 'Kelola User',
-        'icon'    => 'fas fa-users',
-        'submenu' => [
-            [
-                'text' => 'Daftar User',
-                'url'  => 'users',
-                'icon' => 'fas fa-list',
-                'active' => ['users', 'users/index'],
-            ],
-            [
-                'text' => 'Tambah User',
-                'url'  => 'users/create',
-                'icon' => 'fas fa-plus-circle',
-                'active' => ['users/create'],
-            ],
-            [
-                'text' => 'Profil Saya',
-                'url'  => 'profile',
-                'icon' => 'fas fa-user-circle',
-                'active' => ['profile', 'profile/*'],
+        // Header - Sistem
+        ['header' => 'PENGATURAN SISTEM'],
+        
+        [
+            'text'    => 'Kelola User',
+            'icon'    => 'fas fa-users-cog',
+            'submenu' => [
+                [
+                    'text' => 'Daftar User',
+                    'url'  => 'users',
+                    'icon' => 'fas fa-list',
+                    'active' => ['users', 'users/index'],
+                ],
+                [
+                    'text' => 'Tambah User',
+                    'url'  => 'users/create',
+                    'icon' => 'fas fa-plus-circle',
+                    'active' => ['users/create'],
+                ],
             ],
         ],
+        [
+            'text' => 'Profil Saya',
+            'url'  => 'profile',
+            'icon' => 'fas fa-user-circle',
+            'active' => ['profile', 'profile/*'],
+        ],
     ],
-   
-],
 
     /*
     |--------------------------------------------------------------------------

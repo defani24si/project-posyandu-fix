@@ -9,6 +9,11 @@ use Illuminate\Http\Request;
 
 class KaderPosyanduController extends Controller
 {
+    public function __construct()
+    {
+        // Constructor kosong - middleware akan ditangani di route
+    }
+
     /**
      * Display a listing of the resource.
      */

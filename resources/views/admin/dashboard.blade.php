@@ -38,7 +38,19 @@
                     </p>
                 </div>
                 <div class="col-auto">
-                    <i class="fas fa-user-circle fa-3x opacity-50"></i>
+                    <div class="rounded-circle bg-white bg-opacity-25 d-flex align-items-center justify-content-center" 
+                         style="width: 80px; height: 80px; overflow: hidden;">
+                        @if(Auth::user()->foto_profil)
+                            <img src="{{ asset('storage/' . Auth::user()->foto_profil) }}" 
+                                 alt="Foto Profil {{ Auth::user()->name }}" 
+                                 class="w-100 h-100"
+                                 style="object-fit: cover;"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                            <i class="fas fa-user fa-2x text-white opacity-75" style="display: none;"></i>
+                        @else
+                            <i class="fas fa-user fa-2x text-white opacity-75"></i>
+                        @endif
+                    </div>
                 </div>
             </div>
         </div>
@@ -114,13 +126,13 @@
     <!-- Additional Stats Row -->
     <div class="row">
         <div class="col-lg-6 col-12">
-            <div class="info-box bg-gradient-info">
+            <div class="info-box bg-gradient-success">
                 <span class="info-box-icon"><i class="fas fa-syringe"></i></span>
                 <div class="info-box-content">
                     <span class="info-box-text">Imunisasi Bulan Ini</span>
                     <span class="info-box-number">{{ number_format($stats['total_imunisasi_bulan_ini']) }}</span>
                     <div class="progress">
-                        <div class="progress-bar" style="width: {{ min(($stats['total_imunisasi_bulan_ini'] / 100) * 100, 100) }}%"></div>
+                        <div class="progress-bar bg-success" style="width: {{ min(($stats['total_imunisasi_bulan_ini'] / 100) * 100, 100) }}%"></div>
                     </div>
                     <span class="progress-description">
                         Target: 100 imunisasi per bulan
@@ -130,13 +142,13 @@
         </div>
 
         <div class="col-lg-6 col-12">
-            <div class="info-box bg-gradient-success">
+            <div class="info-box bg-gradient-warning">
                 <span class="info-box-icon"><i class="fas fa-calendar-week"></i></span>
                 <div class="info-box-content">
                     <span class="info-box-text">Jadwal Minggu Ini</span>
                     <span class="info-box-number">{{ number_format($stats['jadwal_minggu_ini']) }}</span>
                     <div class="progress">
-                        <div class="progress-bar" style="width: {{ min(($stats['jadwal_minggu_ini'] / 7) * 100, 100) }}%"></div>
+                        <div class="progress-bar bg-warning" style="width: {{ min(($stats['jadwal_minggu_ini'] / 7) * 100, 100) }}%"></div>
                     </div>
                     <span class="progress-description">
                         Dari 7 hari dalam seminggu
@@ -343,6 +355,14 @@
             background: linear-gradient(135deg, #007bff 0%, #0056b3 100%) !important;
         }
         
+        .bg-gradient-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+        }
+        
+        .bg-gradient-warning {
+            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%) !important;
+        }
+        
         .small-box {
             border-radius: 10px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -506,7 +526,7 @@
                 labels: genderData.map(item => item.jenis_kelamin === 'L' ? 'Laki-laki' : 'Perempuan'),
                 datasets: [{
                     data: genderData.map(item => item.total),
-                    backgroundColor: ['#007bff', '#e91e63'],
+                    backgroundColor: ['#17a2b8', '#e91e63'],
                     borderWidth: 0
                 }]
             },

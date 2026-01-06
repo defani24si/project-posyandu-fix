@@ -8,6 +8,10 @@ use Illuminate\Support\Facades\Storage;
 
 class PosyanduController extends Controller
 {
+    public function __construct()
+    {
+        // Constructor kosong - middleware akan ditangani di route
+    }
      public function index(Request $request)
 {
     $query = Posyandu::query();
@@ -35,11 +39,20 @@ class PosyanduController extends Controller
 
     public function create()
     {
+        // Cek apakah user adalah admin
+        if (auth()->user()->role !== 'admin') {
+            return redirect()->back()->with('error', 'Akses ditolak. Hanya admin yang dapat melakukan tindakan ini.');
+        }
+        
         return view('posyandu.create');
     }
 
     public function store(Request $request)
     {
+        // Cek apakah user adalah admin
+        if (auth()->user()->role !== 'admin') {
+            return redirect()->back()->with('error', 'Akses ditolak. Hanya admin yang dapat melakukan tindakan ini.');
+        }
         $request->validate([
             'nama' => 'required|string|max:100',
             'alamat' => 'required|string|max:100',
@@ -92,12 +105,21 @@ class PosyanduController extends Controller
 
     public function edit($id)
     {
+        // Cek apakah user adalah admin
+        if (auth()->user()->role !== 'admin') {
+            return redirect()->back()->with('error', 'Akses ditolak. Hanya admin yang dapat melakukan tindakan ini.');
+        }
+        
         $posyandu = Posyandu::findOrFail($id);
         return view('posyandu.edit', compact('posyandu'));
     }
 
     public function update(Request $request, $id)
     {
+        // Cek apakah user adalah admin
+        if (auth()->user()->role !== 'admin') {
+            return redirect()->back()->with('error', 'Akses ditolak. Hanya admin yang dapat melakukan tindakan ini.');
+        }
         $request->validate([
             'nama' => 'required|string|max:100',
             'alamat' => 'required|string|max:100',
@@ -164,6 +186,10 @@ class PosyanduController extends Controller
 
     public function destroy($id)
     {
+        // Cek apakah user adalah admin
+        if (auth()->user()->role !== 'admin') {
+            return redirect()->back()->with('error', 'Akses ditolak. Hanya admin yang dapat melakukan tindakan ini.');
+        }
         $posyandu = Posyandu::findOrFail($id);
         
         // Hapus foto jika ada

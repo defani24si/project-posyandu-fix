@@ -9,6 +9,10 @@ use Illuminate\Support\Facades\Storage;
 
 class JadwalPosyanduController extends Controller
 {
+    public function __construct()
+    {
+        // Constructor kosong - middleware akan ditangani di route
+    }
     public function index(Request $request)
     {
         $query = JadwalPosyandu::with('posyandu');

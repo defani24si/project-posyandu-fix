@@ -23,13 +23,18 @@ class CreateAdminPosyandu extends Seeder
                 'email' => 'admin@posyandu.id',
                 'password' => Hash::make('admin123'),
                 'role' => 'admin',
-                'foto_profil' => null,
                 'email_verified_at' => now(),
             ]);
             
             $this->command->info('Admin Posyandu berhasil dibuat!');
         } else {
-            $this->command->info('Admin Posyandu sudah ada.');
+            // Update role jika user sudah ada tapi belum ada role
+            if (!$existingAdmin->role) {
+                $existingAdmin->update(['role' => 'admin']);
+                $this->command->info('Role admin berhasil diupdate!');
+            } else {
+                $this->command->info('Admin Posyandu sudah ada.');
+            }
         }
         
         // Buat beberapa user kader contoh
@@ -54,6 +59,12 @@ class CreateAdminPosyandu extends Seeder
             if (!$existingKader) {
                 User::create($kader);
                 $this->command->info('Kader ' . $kader['name'] . ' berhasil dibuat!');
+            } else {
+                // Update role jika user sudah ada tapi belum ada role
+                if (!$existingKader->role) {
+                    $existingKader->update(['role' => 'kader']);
+                    $this->command->info('Role ' . $kader['name'] . ' berhasil diupdate!');
+                }
             }
         }
     }

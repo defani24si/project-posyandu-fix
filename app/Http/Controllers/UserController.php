@@ -9,6 +9,11 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
+    public function __construct()
+    {
+        // Constructor kosong - middleware akan ditangani di route
+    }
+
     public function index(Request $request)
     {
         $query = User::query();
