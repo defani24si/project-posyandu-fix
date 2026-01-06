@@ -1,4 +1,4 @@
-@extends('adminlte::page')
+@extends('layout.app')
 
 @section('title', 'Data Warga')
 
